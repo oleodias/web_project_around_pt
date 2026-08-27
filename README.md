@@ -10,6 +10,21 @@ Este é um cenário que se repete bastante no mercado: pegar o ponto onde um col
 
 ---
 
+## 🚩 Etapa 2 — Modal de perfil
+
+O pop-up de "Editar perfil" ganhou vida.
+
+- **`openModal(modal)`** e **`closeModal(modal)`** recebem um elemento modal e alternam a classe `popup_is-opened`. Servem a **qualquer** modal — contêm apenas o que vale para todos.
+- O pop-up **abre** ao clicar no botão de editar e **fecha** no botão X.
+- Ao abrir, os campos "Nome" e "Sobre mim" já vêm **preenchidos com os dados atuais** do perfil.
+- Ao **salvar**, o nome e a descrição da página são atualizados e o pop-up se fecha.
+
+O envio usa `preventDefault()` para impedir o recarregamento da página, e a
+gravação é feita com `textContent` — nenhum dado digitado pelo usuário é
+atribuído a `innerHTML`.
+
+---
+
 ## 🚩 Etapa 1 — Seu próprio conjunto de dados
 
 Antes de gerar os cartões dinamicamente, é preciso ter os dados. Esta etapa monta a fonte de informação que vai alimentar a galeria nas próximas entregas.
@@ -53,7 +68,7 @@ web_project_around_pt/
 ├── pages/
 │   └── index.css            ← Orquestrador de imports
 ├── scripts/
-│   └── index.js             ← NOVO na Etapa 1
+│   └── index.js             ← lógica do projeto
 ├── vendor/
 │   ├── fonts/               ← Arquivos .woff2 da fonte Inter
 │   ├── fonts.css
