@@ -10,6 +10,24 @@ Este é um cenário que se repete bastante no mercado: pegar o ponto onde um col
 
 ---
 
+## 🚩 Etapa Final — Cartões dinâmicos
+
+A galeria deixou de ser marcação fixa e passou a ser gerada por JavaScript.
+
+- **`<template id="card-template">`** dentro do `<ul class="cards__list">` guarda o molde de um cartão. Os seis cartões escritos à mão saíram do HTML.
+- **`getCardElement(data)`** clona o molde, preenche imagem e título, registra os ouvintes e **devolve** o elemento — sem inseri-lo.
+- **`renderCard(data)`** insere o cartão no início da lista.
+- **Curtir** alterna a classe `card__like-button_is-active`, trocando o coração vazio pelo preenchido.
+- **Excluir** remove o cartão do DOM.
+- **Clicar na imagem** abre o pop-up com a versão ampliada e o título como legenda.
+- **"Novo local"** cria o cartão com os dados digitados, limpa o formulário e fecha o pop-up. O cartão novo entra como **primeiro** da lista.
+
+Cada cartão guarda a referência aos próprios botões por **closure** — não há
+`id` por cartão nem busca no documento. Nenhum dado digitado pelo usuário é
+atribuído a `innerHTML`.
+
+---
+
 ## 🚩 Etapa 2 — Modal de perfil
 
 O pop-up de "Editar perfil" ganhou vida.
@@ -93,10 +111,10 @@ Depois abra `http://localhost:8000` e pressione **F12** para ver os nomes dos se
 
 Funcionalidades previstas para as próximas etapas do projeto:
 
-1. **Geração dinâmica dos cartões**: substituir a marcação fixa por elementos criados a partir do array `initialCards`, usando `<template>` e manipulação do DOM.
-2. **Formulários funcionais**: fazer os pop-ups de editar perfil e adicionar local realmente alterarem a página, com escuta de eventos de envio.
-3. **Curtir e excluir**: alternar o estado do botão de curtida e remover cartões da galeria.
-4. **Visualização ampliada**: abrir a foto em tela cheia ao clicar na imagem do cartão.
+1. **Fechar com Esc e clique no fundo**: hoje os pop-ups só fecham pelo botão X.
+2. **Validação dos formulários**: destacar campos inválidos antes de permitir o envio.
+3. **Persistência**: manter os cartões adicionados após recarregar a página.
+4. **Animação de abertura**: transição suave ao abrir e fechar os pop-ups.
 
 ---
 
