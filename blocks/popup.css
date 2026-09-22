@@ -31,6 +31,22 @@
   cursor: pointer;
 }
 
+/* Botão de envio inativo: o formulário ainda tem campo inválido.
+   Cores conforme o design — confirmar os valores no Figma. */
+.popup__button_disabled {
+  background: #fff;
+  color: #000;
+  border: 1px solid #000;
+  opacity: 0.2;
+  cursor: not-allowed;
+}
+
+/* O botão inativo não é interativo, então não recebe o estado de hover. */
+.popup__button_disabled:hover {
+  background: #fff;
+  cursor: not-allowed;
+}
+
 .popup__close {
   width: 35px;
   height: 35px;
@@ -78,6 +94,26 @@
 
 .popup__input:last-of-type {
   margin-bottom: 0;
+}
+
+/* Campo reprovado na validação. Classe de estado em vez da pseudo-classe
+   :invalid, que pintaria de vermelho os campos vazios já no carregamento. */
+.popup__input_type_error {
+  border-bottom-color: #ff0000;
+}
+
+/* Mensagem de erro do navegador. Nasce oculta para não ocupar espaço
+   enquanto o campo está válido. */
+.popup__error {
+  display: none;
+  font-size: 12px;
+  line-height: 15px;
+  color: #ff0000;
+  margin: 0 0 10px;
+}
+
+.popup__error_visible {
+  display: block;
 }
 
 .popup__title {

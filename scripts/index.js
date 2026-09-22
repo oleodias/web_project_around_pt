@@ -39,9 +39,11 @@ const cardTemplate = document
   .querySelector("#card-template")
   .content.querySelector(".card");
 
+// Todos os pop-ups da página, para registrar o fechamento uma vez só
+const popupList = document.querySelectorAll(".popup");
+
 // Elementos do pop-up de edição de perfil
 const editPopup = document.querySelector("#edit-popup");
-const editPopupCloseButton = editPopup.querySelector(".popup__close");
 const editPopupForm = editPopup.querySelector("#edit-profile-form");
 const editPopupNameInput = editPopup.querySelector(".popup__input_type_name");
 const editPopupDescriptionInput = editPopup.querySelector(
@@ -50,7 +52,6 @@ const editPopupDescriptionInput = editPopup.querySelector(
 
 // Elementos do pop-up de novo local
 const newCardPopup = document.querySelector("#new-card-popup");
-const newCardPopupCloseButton = newCardPopup.querySelector(".popup__close");
 const newCardPopupForm = newCardPopup.querySelector("#new-card-form");
 const newCardPopupNameInput = newCardPopup.querySelector(
   ".popup__input_type_card-name"
@@ -61,18 +62,30 @@ const newCardPopupLinkInput = newCardPopup.querySelector(
 
 // Elementos do pop-up de imagem ampliada
 const imagePopup = document.querySelector("#image-popup");
-const imagePopupCloseButton = imagePopup.querySelector(".popup__close");
 const imagePopupImage = imagePopup.querySelector(".popup__image");
 const imagePopupCaption = imagePopup.querySelector(".popup__caption");
+
+// Fecha o pop-up aberto quando a tecla Esc é pressionada.
+// Precisa ser uma função nomeada: removeEventListener só remove o ouvinte se
+// receber a mesma referência que foi registrada — uma função anônima
+// equivalente seria outra função, e a remoção falharia em silêncio.
+function handleEscapeKey(evt) {
+  if (evt.key === "Escape") {
+    const openedPopup = document.querySelector(".popup_is-opened");
+    closeModal(openedPopup);
+  }
+}
 
 // Torna visível qualquer modal recebido como argumento.
 function openModal(modal) {
   modal.classList.add("popup_is-opened");
+  document.addEventListener("keydown", handleEscapeKey);
 }
 
 // Oculta qualquer modal recebido como argumento.
 function closeModal(modal) {
   modal.classList.remove("popup_is-opened");
+  document.removeEventListener("keydown", handleEscapeKey);
 }
 
 // Monta um cartão a partir do molde e devolve o elemento pronto, sem inseri-lo.
@@ -110,15 +123,32 @@ function renderCard(data) {
   cardsList.prepend(getCardElement(data));
 }
 
+// Fechamento por sobreposição e por botão, registrado de uma vez para todos os
+// pop-ups — evita repetir o mesmo ouvinte três vezes.
+// O evento é "mousedown" e não "click": com "click", arrastar a seleção de
+// dentro de um campo até fora da janela fecharia o pop-up no meio da digitação.
+popupList.forEach(function (popup) {
+  popup.addEventListener("mousedown", function (evt) {
+    const clickTarget = evt.target;
+    const overlay = evt.currentTarget;
+
+    if (
+      clickTarget === overlay ||
+      clickTarget.classList.contains("popup__close")
+    ) {
+      closeModal(popup);
+    }
+  });
+});
+
 // Abre o pop-up de edição já com os dados atuais do perfil nos campos.
+// A validação é redefinida depois de preencher: os valores só podem ser
+// avaliados depois de existirem nos campos.
 profileEditButton.addEventListener("click", function () {
   editPopupNameInput.value = profileTitle.textContent;
   editPopupDescriptionInput.value = profileDescription.textContent;
+  resetValidation(editPopupForm, validationConfig);
   openModal(editPopup);
-});
-
-editPopupCloseButton.addEventListener("click", function () {
-  closeModal(editPopup);
 });
 
 // Grava os dados do formulário no perfil e fecha o pop-up.
@@ -129,12 +159,11 @@ editPopupForm.addEventListener("submit", function (evt) {
   closeModal(editPopup);
 });
 
+// Abre o pop-up de novo local com os campos limpos e o botão inativo.
 profileAddButton.addEventListener("click", function () {
+  newCardPopupForm.reset();
+  resetValidation(newCardPopupForm, validationConfig);
   openModal(newCardPopup);
-});
-
-newCardPopupCloseButton.addEventListener("click", function () {
-  closeModal(newCardPopup);
 });
 
 // Cria o cartão com os dados digitados, limpa o formulário e fecha o pop-up.
@@ -146,10 +175,6 @@ newCardPopupForm.addEventListener("submit", function (evt) {
   });
   evt.target.reset();
   closeModal(newCardPopup);
-});
-
-imagePopupCloseButton.addEventListener("click", function () {
-  closeModal(imagePopup);
 });
 
 // Exibe os cartões iniciais na página.

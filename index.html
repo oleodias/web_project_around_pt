@@ -6,7 +6,6 @@
     <meta content="ie=edge" http-equiv="X-UA-Compatible" />
     <title>Around The U.S.</title>
     <link href="./pages/index.css" rel="stylesheet" />
-    <script defer src="./scripts/index.js"></script>
   </head>
   <body class="page">
     <div class="page__content">
@@ -69,20 +68,32 @@
             type="button"
           ></button>
           <h3 class="popup__title">Editar perfil</h3>
-          <form class="popup__form" id="edit-profile-form">
+          <form class="popup__form" id="edit-profile-form" novalidate>
             <input
               class="popup__input popup__input_type_name"
+              id="name-input"
+              maxlength="40"
+              minlength="2"
               name="name"
               placeholder="Nome"
+              required
               type="text"
             />
+            <span class="popup__error" id="name-input-error"></span>
             <input
               class="popup__input popup__input_type_description"
+              id="description-input"
+              maxlength="200"
+              minlength="2"
               name="description"
               placeholder="Sobre mim"
+              required
               type="text"
             />
-            <button class="button popup__button" type="submit">Salvar</button>
+            <span class="popup__error" id="description-input-error"></span>
+            <button class="button popup__button" disabled type="submit">
+              Salvar
+            </button>
           </form>
         </div>
       </div>
@@ -94,22 +105,30 @@
             type="button"
           ></button>
           <h3 class="popup__title">Novo local</h3>
-          <form class="popup__form" id="new-card-form">
+          <form class="popup__form" id="new-card-form" novalidate>
             <input
               class="popup__input popup__input_type_card-name"
+              id="card-name-input"
+              maxlength="30"
+              minlength="2"
               name="place-name"
               placeholder="Título"
               required
               type="text"
             />
+            <span class="popup__error" id="card-name-input-error"></span>
             <input
               class="popup__input popup__input_type_url"
+              id="link-input"
               name="link"
               placeholder="Link de Imagem"
               required
               type="url"
             />
-            <button class="button popup__button" type="submit">Criar</button>
+            <span class="popup__error" id="link-input-error"></span>
+            <button class="button popup__button" disabled type="submit">
+              Criar
+            </button>
           </form>
         </div>
       </div>
@@ -125,5 +144,7 @@
         </div>
       </div>
     </div>
+    <script src="./scripts/validate.js"></script>
+    <script src="./scripts/index.js"></script>
   </body>
 </html>

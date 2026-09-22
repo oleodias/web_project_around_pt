@@ -10,6 +10,53 @@ Este é um cenário que se repete bastante no mercado: pegar o ponto onde um col
 
 ---
 
+## 🚩 Sprint 9 — Validação dos formulários e pop-ups
+
+Os formulários deixaram de aceitar qualquer coisa, e os pop-ups passaram a
+fechar como o usuário espera.
+
+### Validação — `scripts/validate.js`
+
+- **Uma função universal.** `enableValidation(validationConfig)` percorre todos
+  os formulários da página e liga a validação em cada um. As funções internas
+  não sabem se estão validando "Editar perfil" ou "Novo local": recebem os
+  seletores e as classes pelo objeto de configuração.
+- **A regra mora no HTML**, em `required`, `minlength`, `maxlength` e `type`.
+  O JavaScript só lê o veredito pelo **`ValidityState`** — `input.validity.valid`
+  — em vez de recontar caracteres por conta própria. Uma fonte de verdade só:
+  mudar o `minlength` no HTML muda o comportamento sem tocar no script.
+- **As mensagens são as do navegador**, lidas em `input.validationMessage` e
+  exibidas no `<span class="popup__error">` que fica ao lado de cada campo.
+- **`toggleButtonState()`** é a função separada que controla o botão de envio:
+  ele fica inativo enquanto **qualquer** campo estiver inválido.
+- **`resetValidation()`** limpa as mensagens ao abrir um pop-up, para que os
+  erros da vez anterior não reapareçam.
+
+| Campo | Regra |
+| --- | --- |
+| Nome | obrigatório, 2 a 40 caracteres |
+| Sobre mim | obrigatório, 2 a 200 caracteres |
+| Título | obrigatório, 2 a 30 caracteres |
+| Link de Imagem | obrigatório, precisa ser uma URL |
+
+O `novalidate` nos formulários desliga as bolhas de aviso nativas — **não** a
+validação. O navegador continua avaliando os campos; quem decide como mostrar
+o resultado passa a ser o projeto.
+
+### Fechamento dos pop-ups — `scripts/index.js`
+
+- **Clique na sobreposição** fecha; clique **dentro** do formulário, não. A
+  distinção é `evt.target === evt.currentTarget`: o evento só veio da
+  sobreposição se começou nela, e não num filho.
+- **Tecla Esc** fecha o pop-up aberto. O ouvinte é adicionado em `openModal()`
+  e **removido** em `closeModal()` — por isso `handleEscapeKey` é uma função
+  nomeada: `removeEventListener` só remove o ouvinte se receber a mesma
+  referência que foi registrada.
+- Os três pop-ups compartilham o mesmo ouvinte de fechamento, registrado uma
+  vez com `forEach`, em vez de três blocos iguais.
+
+---
+
 ## 🚩 Etapa Final — Cartões dinâmicos
 
 A galeria deixou de ser marcação fixa e passou a ser gerada por JavaScript.
@@ -50,7 +97,7 @@ Antes de gerar os cartões dinamicamente, é preciso ter os dados. Esta etapa mo
 - **Array `initialCards`** declarado no topo de `scripts/index.js`, com **seis objetos**.
 - Cada objeto carrega duas propriedades: **`name`**, o título do local, e **`link`**, a URL da imagem.
 - **`forEach()`** percorre o array no final do arquivo e exibe o `name` de cada cartão no console do navegador.
-- O script é vinculado ao HTML com o atributo **`defer`**, garantindo que o JavaScript só execute depois que o documento estiver montado.
+- O script é vinculado ao HTML logo antes de `</body>`, garantindo que o JavaScript só execute depois que o documento estiver montado. (Até a Sprint 8 isso era feito com o atributo `defer` no `<head>`.)
 
 Os seis lugares são os mesmos que já apareciam na marcação: Vale de Yosemite, Lago Louise, Montanhas Carecas, Latemar, Parque Nacional da Vanoise e Lago di Braies.
 
@@ -63,7 +110,8 @@ Os seis lugares são os mesmos que já apareciam na marcação: Vale de Yosemite
 - **HTML5 Semântico**: marcação com `<header>`, `<main>`, `<section>`, `<footer>`, `<ul>` e `<li>`, com `alt` descritivo em todas as imagens e `aria-label` nos botões de ícone.
 - **CSS3 com Metodologia BEM Flat**: cada bloco em arquivo próprio dentro de `/blocks`, importados por `pages/index.css`.
 - **JavaScript (ES6+)**: array de objetos como fonte de dados e o método `forEach()` para iterar sobre a coleção.
-- **Atributo `defer`**: o script é baixado em paralelo e executado só após a análise do HTML, sem travar a renderização da página.
+- **API de validação do navegador**: `ValidityState`, `validationMessage` e o atributo `novalidate` para validar os formulários sem reescrever as regras em JavaScript.
+- **Scripts no fim do `<body>`**: `validate.js` e `index.js` executam com o documento já montado, sem travar a renderização.
 - **Fontes locais**: família Inter conectada via `@font-face` em formato `.woff2`.
 - **Normalize.css**: reset de estilos consistente entre navegadores.
 
@@ -86,7 +134,8 @@ web_project_around_pt/
 ├── pages/
 │   └── index.css            ← Orquestrador de imports
 ├── scripts/
-│   └── index.js             ← lógica do projeto
+│   ├── index.js             ← lógica do projeto
+│   └── validate.js          ← validação universal dos formulários
 ├── vendor/
 │   ├── fonts/               ← Arquivos .woff2 da fonte Inter
 │   ├── fonts.css
@@ -111,10 +160,13 @@ Depois abra `http://localhost:8000` e pressione **F12** para ver os nomes dos se
 
 Funcionalidades previstas para as próximas etapas do projeto:
 
-1. **Fechar com Esc e clique no fundo**: hoje os pop-ups só fecham pelo botão X.
-2. **Validação dos formulários**: destacar campos inválidos antes de permitir o envio.
-3. **Persistência**: manter os cartões adicionados após recarregar a página.
-4. **Animação de abertura**: transição suave ao abrir e fechar os pop-ups.
+1. **Persistência**: manter os cartões adicionados após recarregar a página.
+2. **Animação de abertura**: transição suave ao abrir e fechar os pop-ups.
+3. **Mensagens próprias**: substituir as mensagens padrão do navegador por
+   textos mais específicos, com `setCustomValidity()`.
+
+> Concluídos na Sprint 9: fechar com Esc e com clique na sobreposição, e a
+> validação dos dois formulários.
 
 ---
 
