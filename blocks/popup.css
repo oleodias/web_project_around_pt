@@ -32,7 +32,8 @@
 }
 
 /* Botão de envio inativo: o formulário ainda tem campo inválido.
-   Cores conforme o design — confirmar os valores no Figma. */
+   O design mostra o mesmo botão preto a 20% sobre o branco — daí a borda e o
+   texto saírem cinza-claros sem precisar de uma cor própria. */
 .popup__button_disabled {
   background: #fff;
   color: #000;
@@ -102,12 +103,14 @@
   border-bottom-color: #ff0000;
 }
 
-/* Mensagem de erro do navegador. Nasce oculta para não ocupar espaço
-   enquanto o campo está válido. */
+/* Mensagem de erro do navegador, com os valores do design: Inter 12px,
+   peso 400, altura de linha 100%, sem espaçamento entre letras. */
 .popup__error {
   display: none;
   font-size: 12px;
-  line-height: 15px;
+  line-height: 12px;
+  font-weight: 400;
+  letter-spacing: 0;
   color: #ff0000;
   margin: 0 0 10px;
 }
