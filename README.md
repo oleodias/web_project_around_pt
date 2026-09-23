@@ -10,6 +10,59 @@ Este é um cenário que se repete bastante no mercado: pegar o ponto onde um col
 
 ---
 
+## 🚩 Sprint 10 — Classes e módulos
+
+Toda a funcionalidade já existia; esta etapa reorganizou o código. O que era
+um `index.js` com tudo dentro virou quatro arquivos, cada um com uma
+responsabilidade só.
+
+| Arquivo | Responsabilidade |
+| --- | --- |
+| `scripts/Card.js` | a classe `Card`: um cartão, com os próprios dados e os próprios botões |
+| `scripts/FormValidator.js` | a classe `FormValidator`: a validação de um formulário |
+| `scripts/utils.js` | abrir e fechar pop-ups, Esc, sobreposição e o pop-up de imagem |
+| `scripts/index.js` | a página: dados iniciais, instâncias e ouvintes |
+
+### `Card`
+
+- **`new Card(data, templateSelector)`** recebe o nome, o link da imagem e o
+  seletor do `<template>`.
+- **`generateCard()`** é o único método público: clona o template, preenche,
+  registra os ouvintes e devolve o cartão pronto para entrar na página.
+- Os métodos privados (`_getTemplate`, `_setCardData`, `_setEventListeners`,
+  `_handleLikeClick`, `_handleDeleteClick`, `_handleImageClick`) cuidam de
+  cada parte.
+- O cartão só registra ouvintes nos **próprios** botões. O pop-up de imagem é
+  um só para a página inteira, então o cartão pede para abri-lo
+  (`openImagePopup`, de `utils.js`), mas não pendura ouvinte nele — senão cada
+  cartão novo acrescentaria mais um.
+
+### `FormValidator`
+
+- **`new FormValidator(config, formElement)`** recebe o objeto de configuração
+  e o formulário. Uma instância para cada formulário.
+- **`setEventListeners()`** inicia a validação.
+- **`resetValidation()`** limpa os erros ao abrir o pop-up.
+- Os métodos privados usam os campos da instância (`this._inputs`,
+  `this._submitButton`) em vez de receber os mesmos dados a cada chamada.
+
+### Módulos
+
+Os quatro arquivos se conectam por `import`/`export`, e o `index.html` carrega
+só o ponto de entrada:
+
+```html
+<script type="module" src="./scripts/index.js"></script>
+```
+
+Cada módulo tem escopo próprio: nada é declarado no escopo global da página.
+
+> **Módulos precisam de servidor local.** Aberto com dois cliques
+> (`file://`), o navegador bloqueia os scripts. Veja "Como executar
+> localmente".
+
+---
+
 ## 🚩 Sprint 9 — Validação dos formulários e pop-ups
 
 Os formulários deixaram de aceitar qualquer coisa, e os pop-ups passaram a
@@ -111,7 +164,8 @@ Os seis lugares são os mesmos que já apareciam na marcação: Vale de Yosemite
 - **CSS3 com Metodologia BEM Flat**: cada bloco em arquivo próprio dentro de `/blocks`, importados por `pages/index.css`.
 - **JavaScript (ES6+)**: array de objetos como fonte de dados e o método `forEach()` para iterar sobre a coleção.
 - **API de validação do navegador**: `ValidityState`, `validationMessage` e o atributo `novalidate` para validar os formulários sem reescrever as regras em JavaScript.
-- **Scripts no fim do `<body>`**: `validate.js` e `index.js` executam com o documento já montado, sem travar a renderização.
+- **Programação orientada a objetos**: classes ES6 (`Card` e `FormValidator`) com métodos privados por convenção (`_`) e um método público cada.
+- **Módulos ES6**: `import`/`export` entre quatro arquivos, carregados com `type="module"`.
 - **Fontes locais**: família Inter conectada via `@font-face` em formato `.woff2`.
 - **Normalize.css**: reset de estilos consistente entre navegadores.
 
@@ -134,8 +188,10 @@ web_project_around_pt/
 ├── pages/
 │   └── index.css            ← Orquestrador de imports
 ├── scripts/
-│   ├── index.js             ← lógica do projeto
-│   └── validate.js          ← validação universal dos formulários
+│   ├── Card.js              ← classe do cartão
+│   ├── FormValidator.js     ← classe da validação de formulário
+│   ├── index.js             ← ponto de entrada: dados, instâncias e ouvintes
+│   └── utils.js             ← abrir/fechar pop-ups e seus manipuladores
 ├── vendor/
 │   ├── fonts/               ← Arquivos .woff2 da fonte Inter
 │   ├── fonts.css
@@ -152,7 +208,11 @@ web_project_around_pt/
 python3 -m http.server 8000
 ```
 
-Depois abra `http://localhost:8000` e pressione **F12** para ver os nomes dos seis cartões listados no console.
+Depois abra `http://localhost:8000`. No VS Code, a extensão **Live Server**
+faz o mesmo: botão direito no `index.html` → "Open with Live Server".
+
+O servidor é obrigatório: como os scripts são módulos, abrir o `index.html`
+direto do disco faz o navegador bloqueá-los, e a página fica sem cartões.
 
 ---
 
