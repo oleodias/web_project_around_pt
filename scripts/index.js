@@ -1,3 +1,7 @@
+import Card from "./Card.js";
+import FormValidator from "./FormValidator.js";
+import { openModal, closeModal, handlePopupMousedown } from "./utils.js";
+
 // Dados iniciais dos cartões exibidos na página.
 // Cada objeto tem duas propriedades: name (título do local) e link (URL da imagem).
 const initialCards = [
@@ -27,20 +31,26 @@ const initialCards = [
   },
 ];
 
+// Seletores e classes usados pela validação dos formulários
+const validationConfig = {
+  inputSelector: ".popup__input",
+  submitButtonSelector: ".popup__button",
+  inputErrorClass: "popup__input_type_error",
+  errorClass: "popup__error_visible",
+  disabledButtonClass: "popup__button_disabled",
+};
+
+const cardTemplateSelector = "#card-template";
+
 // Elementos da seção de perfil
 const profileEditButton = document.querySelector(".profile__edit-button");
 const profileAddButton = document.querySelector(".profile__add-button");
 const profileTitle = document.querySelector(".profile__title");
 const profileDescription = document.querySelector(".profile__description");
 
-// Lista de cartões e o molde usado para criar cada um
+// Lista de cartões e todos os pop-ups da página
 const cardsList = document.querySelector(".cards__list");
-const cardTemplate = document
-  .querySelector("#card-template")
-  .content.querySelector(".card");
-
-// Todos os pop-ups da página, para registrar o fechamento uma vez só
-const popupList = document.querySelectorAll(".popup");
+const popups = document.querySelectorAll(".popup");
 
 // Elementos do pop-up de edição de perfil
 const editPopup = document.querySelector("#edit-popup");
@@ -60,85 +70,24 @@ const newCardPopupLinkInput = newCardPopup.querySelector(
   ".popup__input_type_url"
 );
 
-// Elementos do pop-up de imagem ampliada
-const imagePopup = document.querySelector("#image-popup");
-const imagePopupImage = imagePopup.querySelector(".popup__image");
-const imagePopupCaption = imagePopup.querySelector(".popup__caption");
+// Uma instância de FormValidator para cada formulário
+const editProfileValidator = new FormValidator(validationConfig, editPopupForm);
+const newCardValidator = new FormValidator(validationConfig, newCardPopupForm);
 
-// Fecha o pop-up aberto quando a tecla Esc é pressionada.
-// Precisa ser uma função nomeada: removeEventListener só remove o ouvinte se
-// receber a mesma referência que foi registrada — uma função anônima
-// equivalente seria outra função, e a remoção falharia em silêncio.
-function handleEscapeKey(evt) {
-  if (evt.key === "Escape") {
-    const openedPopup = document.querySelector(".popup_is-opened");
-    closeModal(openedPopup);
-  }
-}
-
-// Torna visível qualquer modal recebido como argumento.
-function openModal(modal) {
-  modal.classList.add("popup_is-opened");
-  document.addEventListener("keydown", handleEscapeKey);
-}
-
-// Oculta qualquer modal recebido como argumento.
-function closeModal(modal) {
-  modal.classList.remove("popup_is-opened");
-  document.removeEventListener("keydown", handleEscapeKey);
-}
-
-// Monta um cartão a partir do molde e devolve o elemento pronto, sem inseri-lo.
-function getCardElement(data) {
-  const cardElement = cardTemplate.cloneNode(true);
-  const cardImage = cardElement.querySelector(".card__image");
-  const cardTitle = cardElement.querySelector(".card__title");
-  const cardLikeButton = cardElement.querySelector(".card__like-button");
-  const cardDeleteButton = cardElement.querySelector(".card__delete-button");
-
-  cardImage.src = data.link;
-  cardImage.alt = data.name;
-  cardTitle.textContent = data.name;
-
-  cardLikeButton.addEventListener("click", function () {
-    cardLikeButton.classList.toggle("card__like-button_is-active");
-  });
-
-  cardDeleteButton.addEventListener("click", function () {
-    cardElement.remove();
-  });
-
-  cardImage.addEventListener("click", function () {
-    imagePopupImage.src = data.link;
-    imagePopupImage.alt = data.name;
-    imagePopupCaption.textContent = data.name;
-    openModal(imagePopup);
-  });
-
-  return cardElement;
+// Cria o cartão a partir dos dados e o devolve pronto, sem inseri-lo.
+function createCard(data) {
+  const card = new Card(data, cardTemplateSelector);
+  return card.generateCard();
 }
 
 // Insere um cartão no início da lista.
 function renderCard(data) {
-  cardsList.prepend(getCardElement(data));
+  cardsList.prepend(createCard(data));
 }
 
-// Fechamento por sobreposição e por botão, registrado de uma vez para todos os
-// pop-ups — evita repetir o mesmo ouvinte três vezes.
-// O evento é "mousedown" e não "click": com "click", arrastar a seleção de
-// dentro de um campo até fora da janela fecharia o pop-up no meio da digitação.
-popupList.forEach(function (popup) {
-  popup.addEventListener("mousedown", function (evt) {
-    const clickTarget = evt.target;
-    const overlay = evt.currentTarget;
-
-    if (
-      clickTarget === overlay ||
-      clickTarget.classList.contains("popup__close")
-    ) {
-      closeModal(popup);
-    }
-  });
+// Fechamento por sobreposição e por botão X, registrado uma vez por pop-up.
+popups.forEach(function (popup) {
+  popup.addEventListener("mousedown", handlePopupMousedown);
 });
 
 // Abre o pop-up de edição já com os dados atuais do perfil nos campos.
@@ -147,7 +96,7 @@ popupList.forEach(function (popup) {
 profileEditButton.addEventListener("click", function () {
   editPopupNameInput.value = profileTitle.textContent;
   editPopupDescriptionInput.value = profileDescription.textContent;
-  resetValidation(editPopupForm, validationConfig);
+  editProfileValidator.resetValidation();
   openModal(editPopup);
 });
 
@@ -162,7 +111,7 @@ editPopupForm.addEventListener("submit", function (evt) {
 // Abre o pop-up de novo local com os campos limpos e o botão inativo.
 profileAddButton.addEventListener("click", function () {
   newCardPopupForm.reset();
-  resetValidation(newCardPopupForm, validationConfig);
+  newCardValidator.resetValidation();
   openModal(newCardPopup);
 });
 
@@ -176,6 +125,10 @@ newCardPopupForm.addEventListener("submit", function (evt) {
   evt.target.reset();
   closeModal(newCardPopup);
 });
+
+// Inicia a validação dos dois formulários.
+editProfileValidator.setEventListeners();
+newCardValidator.setEventListeners();
 
 // Exibe os cartões iniciais na página.
 initialCards.forEach(function (cardData) {
