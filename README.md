@@ -10,6 +10,38 @@ Este é um cenário que se repete bastante no mercado: pegar o ponto onde um col
 
 ---
 
+## 🚩 Sprint 11 — Pop-ups, seção e usuário em classes
+
+A refatoração continua: o que ainda eram funções soltas virou classe, e o
+`index.js` ficou só com a criação das instâncias e os ouvintes.
+
+| Classe | Responsabilidade |
+| --- | --- |
+| `Section` | recebe uma lista e uma função `renderer`, e põe cada item no contêiner. Não tem marcação própria nem sabe o que está renderizando |
+| `Popup` | abre e fecha um pop-up; fecha pelo X, pela sobreposição e pelo Esc |
+| `PopupWithImage` | filha de `Popup`: preenche imagem e legenda antes de abrir |
+| `PopupWithForm` | filha de `Popup`: lê os campos, entrega os dados a um callback e limpa o formulário ao fechar |
+| `UserInfo` | lê e grava o nome e a descrição do perfil na página |
+| `Card` | recebe `handleCardClick` de fora: o cartão avisa que foi clicado, e o `index.js` decide abrir o pop-up |
+| `FormValidator` | sem mudanças |
+
+### Acoplamento fraco
+
+Nenhuma classe cria instância de outra. As ligações são feitas no
+`index.js`, por meio de callbacks: o `Card` não conhece o `PopupWithImage`, o
+`PopupWithForm` não sabe se está editando o perfil ou criando um cartão, e a
+`Section` não sabe que o que ela renderiza são cartões.
+
+### `bind` e ouvintes removíveis
+
+`Popup` e `Card` prendem os próprios manipuladores com `bind` no construtor.
+Isso resolve duas coisas de uma vez: o `this` continua sendo a instância
+quando o método é passado ao `addEventListener`, e existe uma referência fixa
+para o `removeEventListener`. É assim que o ouvinte do Esc é removido ao
+fechar o pop-up, e que o cartão desliga os próprios ouvintes ao ser excluído.
+
+---
+
 ## 🚩 Sprint 10 — Classes e módulos
 
 Toda a funcionalidade já existia; esta etapa reorganizou o código. O que era
@@ -165,7 +197,9 @@ Os seis lugares são os mesmos que já apareciam na marcação: Vale de Yosemite
 - **JavaScript (ES6+)**: array de objetos como fonte de dados e o método `forEach()` para iterar sobre a coleção.
 - **API de validação do navegador**: `ValidityState`, `validationMessage` e o atributo `novalidate` para validar os formulários sem reescrever as regras em JavaScript.
 - **Programação orientada a objetos**: classes ES6 (`Card` e `FormValidator`) com métodos privados por convenção (`_`) e um método público cada.
-- **Módulos ES6**: `import`/`export` entre quatro arquivos, carregados com `type="module"`.
+- **Módulos ES6**: `import`/`export` entre os componentes, carregados a partir de `src/pages/index.js` com `type="module"`.
+- **Herança**: `PopupWithImage` e `PopupWithForm` estendem `Popup` e sobrescrevem `open()`, `close()` e `setEventListeners()` com `super`.
+- **Callbacks e `bind`**: as classes se comunicam por funções recebidas no construtor, e os manipuladores de eventos têm `this` e referência fixos.
 - **Fontes locais**: família Inter conectada via `@font-face` em formato `.woff2`.
 - **Normalize.css**: reset de estilos consistente entre navegadores.
 
@@ -175,28 +209,27 @@ Os seis lugares são os mesmos que já apareciam na marcação: Vale de Yosemite
 
 ```
 web_project_around_pt/
-├── blocks/                  ← Blocos BEM (CSS por componente)
-│   ├── card.css
-│   ├── cards.css
-│   ├── content.css
-│   ├── footer.css
-│   ├── header.css
-│   ├── page.css
-│   ├── popup.css
-│   └── profile.css
-├── images/                  ← Ícones da interface e avatar
-├── pages/
-│   └── index.css            ← Orquestrador de imports
-├── scripts/
-│   ├── Card.js              ← classe do cartão
-│   ├── FormValidator.js     ← classe da validação de formulário
-│   ├── index.js             ← ponto de entrada: dados, instâncias e ouvintes
-│   └── utils.js             ← abrir/fechar pop-ups e seus manipuladores
-├── vendor/
-│   ├── fonts/               ← Arquivos .woff2 da fonte Inter
-│   ├── fonts.css
-│   └── normalize.css
-├── index.html
+├── src/
+│   ├── blocks/                  ← Blocos BEM (CSS por componente)
+│   ├── components/              ← Uma classe por arquivo
+│   │   ├── Card.js
+│   │   ├── FormValidator.js
+│   │   ├── Popup.js
+│   │   ├── PopupWithForm.js
+│   │   ├── PopupWithImage.js
+│   │   ├── Section.js
+│   │   └── UserInfo.js
+│   ├── images/                  ← Ícones da interface e avatar
+│   ├── pages/
+│   │   ├── index.css            ← Orquestrador de imports
+│   │   └── index.js             ← Instâncias e ouvintes
+│   ├── utils/
+│   │   └── constants.js         ← Dados, configuração e seletores
+│   ├── vendor/
+│   │   ├── fonts/               ← Arquivos .woff2 da fonte Inter
+│   │   ├── fonts.css
+│   │   └── normalize.css
+│   └── index.html
 └── README.md
 ```
 
@@ -205,11 +238,12 @@ web_project_around_pt/
 ## 💻 Como executar localmente
 
 ```bash
+cd src
 python3 -m http.server 8000
 ```
 
 Depois abra `http://localhost:8000`. No VS Code, a extensão **Live Server**
-faz o mesmo: botão direito no `index.html` → "Open with Live Server".
+faz o mesmo: botão direito no `src/index.html` → "Open with Live Server".
 
 O servidor é obrigatório: como os scripts são módulos, abrir o `index.html`
 direto do disco faz o navegador bloqueá-los, e a página fica sem cartões.
