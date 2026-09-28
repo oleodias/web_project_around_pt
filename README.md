@@ -10,6 +10,72 @@ Este é um cenário que se repete bastante no mercado: pegar o ponto onde um col
 
 ---
 
+## 🚩 Sprint 12 — Conectado ao servidor
+
+A página deixou de guardar os dados em memória: perfil, foto e cartões agora
+vêm do servidor do projeto e são salvos nele. Recarregar a página mantém tudo.
+
+### O que o usuário pode fazer
+
+- Ver o perfil e os cartões carregados do servidor
+- Editar nome e descrição
+- Trocar a foto do perfil: passando o mouse na foto aparece o lápis, e o
+  clique abre o formulário
+- Adicionar cartões, curtir e descurtir
+- Excluir os **próprios** cartões, depois de confirmar no pop-up "Tem
+  certeza?". Cartões de outras pessoas não têm lixeira
+- Enquanto uma solicitação está em andamento, o botão do formulário mostra
+  **"Salvando..."**
+
+### `Api` — toda a comunicação com o servidor
+
+| Método | Solicitação |
+| --- | --- |
+| `getUserInfo()` | `GET /users/me` |
+| `getInitialCards()` | `GET /cards` |
+| `getAppInfo()` | as duas acima com `Promise.all` |
+| `setUserInfo({ name, about })` | `PATCH /users/me` |
+| `setUserAvatar({ avatar })` | `PATCH /users/me/avatar` |
+| `addCard({ name, link })` | `POST /cards` |
+| `deleteCard(cardId)` | `DELETE /cards/:cardId` |
+| `changeLikeStatus(cardId, isLiked)` | `PUT` ou `DELETE /cards/:cardId/likes` |
+
+- Cada método faz `return fetch(...)`: devolve a promessa, e quem decide o que
+  fazer com os dados é o `index.js`.
+- **`_checkResponse`** é escrito uma vez só: se `res.ok`, lê o JSON; senão,
+  rejeita com `Error: <status>`. É necessário porque o `fetch` só rejeita
+  quando a rede falha — um 404 ou 500 chegaria ao `then()` como se tivesse
+  dado certo.
+- Uma única instância, criada no `index.js` com o endereço do servidor e o
+  token.
+
+### A ordem das coisas
+
+- **Os cartões só são desenhados depois de chegar o id do usuário.**
+  `getAppInfo()` espera usuário **e** cartões; só então cada cartão sabe se é
+  do usuário e se mostra a lixeira.
+- **A página só muda depois de o servidor confirmar.** O coração troca de cor
+  com o `isLiked` que volta da resposta, o cartão só sai da página depois do
+  `DELETE`, e o pop-up só fecha depois de salvar. Se der erro, nada muda na
+  tela, o erro vai para o console e o botão volta ao texto original.
+- **Todo envio de formulário passa pela mesma função**, `handleSubmit()`:
+  mostra "Salvando...", faz a solicitação, fecha o pop-up se deu certo e, no
+  `finally()`, devolve o texto do botão.
+
+### Classes novas e alteradas
+
+| Classe | O que mudou |
+| --- | --- |
+| `Api` | nova — veja acima |
+| `PopupWithConfirmation` | nova, filha de `Popup`: o "Tem certeza?". Não sabe o que está confirmando; a ação chega por `setSubmitAction()` a cada abertura, já com o cartão certo |
+| `Card` | recebe o id do usuário e três callbacks (imagem, lixeira, coração). Ganhou `getId()`, `isLiked()`, `setLikeState()` e `removeCard()`, que o `index.js` chama depois da resposta do servidor |
+| `PopupWithForm` | ganhou `renderLoading()`, que troca o texto do botão |
+| `PopupWithImage` | ganhou `close()`: limpa imagem, texto alternativo e legenda ao fechar |
+| `UserInfo` | passou a cuidar também da foto; usa `about`, o nome que o servidor usa |
+| `Section` | os itens chegam em `renderItems(items)`, porque só existem depois da resposta do servidor |
+
+---
+
 ## 🚩 Sprint 11 — Pop-ups, seção e usuário em classes
 
 A refatoração continua: o que ainda eram funções soltas virou classe, e o
@@ -200,6 +266,7 @@ Os seis lugares são os mesmos que já apareciam na marcação: Vale de Yosemite
 - **Módulos ES6**: `import`/`export` entre os componentes, carregados a partir de `src/pages/index.js` com `type="module"`.
 - **Herança**: `PopupWithImage` e `PopupWithForm` estendem `Popup` e sobrescrevem `open()`, `close()` e `setEventListeners()` com `super`.
 - **Callbacks e `bind`**: as classes se comunicam por funções recebidas no construtor, e os manipuladores de eventos têm `this` e referência fixos.
+- **`fetch` e promessas**: solicitações `GET`, `POST`, `PATCH`, `PUT` e `DELETE` a uma API REST, com `then`, `catch`, `finally` e `Promise.all`.
 - **Fontes locais**: família Inter conectada via `@font-face` em formato `.woff2`.
 - **Normalize.css**: reset de estilos consistente entre navegadores.
 
@@ -212,9 +279,11 @@ web_project_around_pt/
 ├── src/
 │   ├── blocks/                  ← Blocos BEM (CSS por componente)
 │   ├── components/              ← Uma classe por arquivo
+│   │   ├── Api.js
 │   │   ├── Card.js
 │   │   ├── FormValidator.js
 │   │   ├── Popup.js
+│   │   ├── PopupWithConfirmation.js
 │   │   ├── PopupWithForm.js
 │   │   ├── PopupWithImage.js
 │   │   ├── Section.js
@@ -224,7 +293,7 @@ web_project_around_pt/
 │   │   ├── index.css            ← Orquestrador de imports
 │   │   └── index.js             ← Instâncias e ouvintes
 │   ├── utils/
-│   │   └── constants.js         ← Dados, configuração e seletores
+│   │   └── constants.js         ← Servidor, configuração e seletores
 │   ├── vendor/
 │   │   ├── fonts/               ← Arquivos .woff2 da fonte Inter
 │   │   ├── fonts.css
@@ -254,13 +323,14 @@ direto do disco faz o navegador bloqueá-los, e a página fica sem cartões.
 
 Funcionalidades previstas para as próximas etapas do projeto:
 
-1. **Persistência**: manter os cartões adicionados após recarregar a página.
-2. **Animação de abertura**: transição suave ao abrir e fechar os pop-ups.
-3. **Mensagens próprias**: substituir as mensagens padrão do navegador por
+1. **Animação de abertura**: transição suave ao abrir e fechar os pop-ups.
+2. **Mensagens próprias**: substituir as mensagens padrão do navegador por
    textos mais específicos, com `setCustomValidity()`.
+3. **Erros na tela**: hoje uma falha do servidor vai para o console; o
+   próximo passo é avisar o usuário na própria página.
 
-> Concluídos na Sprint 9: fechar com Esc e com clique na sobreposição, e a
-> validação dos dois formulários.
+> Concluídos: fechar com Esc e com clique na sobreposição, e a validação dos
+> formulários (Sprint 9); persistência dos dados no servidor (Sprint 12).
 
 ---
 
