@@ -1,21 +1,25 @@
 // Os dados do perfil exibidos na página.
 export default class UserInfo {
-  constructor({ nameSelector, jobSelector }) {
+  constructor({ nameSelector, aboutSelector, avatarSelector }) {
     this._name = document.querySelector(nameSelector);
-    this._job = document.querySelector(jobSelector);
+    this._about = document.querySelector(aboutSelector);
+    this._avatar = document.querySelector(avatarSelector);
   }
 
-  // As chaves são as mesmas dos atributos name do formulário "Editar perfil",
-  // para o objeto ir direto para o setInputValues() do pop-up.
+  // As chaves são as mesmas do servidor e dos atributos name do formulário
+  // "Editar perfil": o objeto vai direto para o setInputValues() do pop-up.
   getUserInfo() {
     return {
       name: this._name.textContent,
-      job: this._job.textContent,
+      about: this._about.textContent,
     };
   }
 
-  setUserInfo({ name, job }) {
+  // Recebe o objeto do usuário como o servidor o devolve.
+  setUserInfo({ name, about, avatar }) {
     this._name.textContent = name;
-    this._job.textContent = job;
+    this._about.textContent = about;
+    this._avatar.src = avatar;
+    this._avatar.alt = `Foto de perfil de ${name}`;
   }
 }

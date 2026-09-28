@@ -37,13 +37,44 @@
   max-width: 373px;
 }
 
+/* A foto fica dentro de um botão: é ele que abre o pop-up e recebe o hover. */
+.profile__avatar-button {
+  width: 120px;
+  height: 120px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+  cursor: pointer;
+  padding: 0;
+  margin: 0 29px 0 0;
+}
+
+/* Camada do hover, com as medidas do design: preto a 80% sobre a foto e o
+   lápis branco de 26px no centro. */
+.profile__avatar-button::after {
+  content: "";
+  background: rgba(0, 0, 0, 0.8) url("../images/edit-icon.svg") center no-repeat;
+  background-size: 26px 26px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  opacity: 0;
+}
+
+.profile__avatar-button:hover::after {
+  opacity: 1;
+}
+
 .profile__image {
   width: 120px;
   height: 120px;
-  border-radius: 50%;
+  display: block;
   object-fit: cover;
-  background-position: center;
-  margin-right: 29px;
 }
 
 .profile__add-button {
@@ -120,7 +151,7 @@
     max-width: 282px;
   }
 
-  .profile__image {
+  .profile__avatar-button {
     margin-right: 0;
   }
 

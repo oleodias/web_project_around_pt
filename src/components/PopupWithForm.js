@@ -8,6 +8,8 @@ export default class PopupWithForm extends Popup {
     this._handleFormSubmit = handleFormSubmit;
     this._form = this._popup.querySelector(".popup__form");
     this._inputs = Array.from(this._form.querySelectorAll(".popup__input"));
+    this._submitButton = this._form.querySelector(".popup__button");
+    this._submitButtonText = this._submitButton.textContent;
   }
 
   // Reúne os valores dos campos num objeto, usando o atributo name de cada
@@ -28,6 +30,14 @@ export default class PopupWithForm extends Popup {
     this._inputs.forEach((input) => {
       input.value = data[input.name];
     });
+  }
+
+  // Troca o texto do botão enquanto a solicitação está em andamento e o
+  // devolve ao original quando ela termina.
+  renderLoading(isLoading, loadingText) {
+    this._submitButton.textContent = isLoading
+      ? loadingText
+      : this._submitButtonText;
   }
 
   // Acrescenta o envio ao que o pai já registra (X e sobreposição).

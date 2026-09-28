@@ -197,3 +197,23 @@
     padding: 0;
   }
 }
+
+/* Pop-ups compactos — "Tem certeza?" e "Alterar a foto do perfil" —, com as
+   medidas do design: a altura vem do conteúdo, o botão fica a 31px do que
+   está acima dele e a 36px do fundo.
+   "Tem certeza?": 34 + 30 (título) + 31 + 50 (botão) + 36 = 181.
+   Foto do perfil: 34 + 30 + 27 + 47 (campo) + 17 (erro) + 31 + 50 + 36 = 272.
+   Ficam depois da media query para valer em todas as larguras. */
+.popup__content_type_compact {
+  min-height: auto;
+  padding-bottom: 36px;
+}
+
+.popup__button_type_compact {
+  margin-top: 31px;
+}
+
+/* Sem campos, o botão vem logo abaixo do título. */
+.popup__form_type_confirm {
+  margin-top: 0;
+}

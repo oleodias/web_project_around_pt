@@ -18,7 +18,17 @@
       </header>
       <main class="content">
         <section class="profile page__section">
-          <img class="profile__image" src="./images/avatar.jpg" alt="Avatar" />
+          <button
+            aria-label="Alterar a foto do perfil"
+            class="profile__avatar-button"
+            type="button"
+          >
+            <img
+              alt="Foto de perfil"
+              class="profile__image"
+              src="./images/avatar.jpg"
+            />
+          </button>
           <div class="profile__info">
             <h1 class="profile__title">Jacques Cousteau</h1>
             <button
@@ -85,7 +95,7 @@
               id="description-input"
               maxlength="200"
               minlength="2"
-              name="job"
+              name="about"
               placeholder="Sobre mim"
               required
               type="text"
@@ -128,6 +138,52 @@
             <span class="popup__error" id="link-input-error"></span>
             <button class="button popup__button" disabled type="submit">
               Criar
+            </button>
+          </form>
+        </div>
+      </div>
+      <div class="popup" id="avatar-popup">
+        <div class="popup__content popup__content_type_compact">
+          <button
+            aria-label="Fechar pop-up"
+            class="popup__close"
+            type="button"
+          ></button>
+          <h3 class="popup__title">Alterar a foto do perfil</h3>
+          <form class="popup__form" id="avatar-form" novalidate>
+            <input
+              class="popup__input popup__input_type_url"
+              id="avatar-input"
+              name="avatar"
+              placeholder="Link da foto"
+              required
+              type="url"
+            />
+            <span class="popup__error" id="avatar-input-error"></span>
+            <button
+              class="button popup__button popup__button_type_compact"
+              disabled
+              type="submit"
+            >
+              Salvar
+            </button>
+          </form>
+        </div>
+      </div>
+      <div class="popup" id="confirm-popup">
+        <div class="popup__content popup__content_type_compact">
+          <button
+            aria-label="Fechar pop-up"
+            class="popup__close"
+            type="button"
+          ></button>
+          <h3 class="popup__title">Tem certeza?</h3>
+          <form class="popup__form popup__form_type_confirm" id="confirm-form">
+            <button
+              class="button popup__button popup__button_type_compact"
+              type="submit"
+            >
+              Sim
             </button>
           </form>
         </div>

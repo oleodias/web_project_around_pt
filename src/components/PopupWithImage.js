@@ -16,4 +16,14 @@ export default class PopupWithImage extends Popup {
     this._caption.textContent = name;
     super.open();
   }
+
+  // Desfaz o que o open() preencheu, para a imagem anterior não ficar retida.
+  // removeAttribute em vez de src = "": um src vazio dispara um evento error
+  // na imagem.
+  close() {
+    super.close();
+    this._image.removeAttribute("src");
+    this._image.alt = "";
+    this._caption.textContent = "";
+  }
 }
