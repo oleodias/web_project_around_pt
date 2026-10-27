@@ -1,5 +1,26 @@
 # 🗺️ Around The U.S. — Ao Redor dos EUA
 
+## 📅 Sprints
+
+Projeto das **Sprints 8 a 12** do curso de Desenvolvimento Web da TripleTen
+Brasil. O mesmo projeto continua em React no repositório
+[`web_project_around_react`](https://github.com/oleodias/web_project_around_react)
+(Sprints 13 e 14), e o back-end dele está em
+[`web_project_around_express`](https://github.com/oleodias/web_project_around_express)
+(Sprints 15 e 16).
+
+| Sprint | O que foi feito neste repositório |
+| --- | --- |
+| 8 | em três etapas: os dados próprios, o pop-up de perfil e os cartões criados por JavaScript |
+| 9 | validação dos formulários e fechamento dos pop-ups com Esc e clique fora |
+| 10 | as classes `Card` e `FormValidator` e os módulos ES6 |
+| 11 | as classes `Section`, `Popup` (e filhas) e `UserInfo` |
+| 12 | a classe `Api`: perfil, foto e cartões salvos no servidor |
+
+Abaixo, as seções estão da sprint mais recente para a mais antiga.
+
+---
+
 ## 📝 Descrição do Projeto
 
 **Around The U.S.** é uma página interativa onde o usuário monta sua própria galeria de lugares: adiciona novos cartões, remove os que não quer mais e curte as fotos favoritas.
@@ -208,7 +229,7 @@ o resultado passa a ser o projeto.
 
 ---
 
-## 🚩 Etapa Final — Cartões dinâmicos
+## 🚩 Sprint 8 (etapa final) — Cartões dinâmicos
 
 A galeria deixou de ser marcação fixa e passou a ser gerada por JavaScript.
 
@@ -226,7 +247,7 @@ atribuído a `innerHTML`.
 
 ---
 
-## 🚩 Etapa 2 — Modal de perfil
+## 🚩 Sprint 8 (etapa 2) — Modal de perfil
 
 O pop-up de "Editar perfil" ganhou vida.
 
@@ -241,7 +262,7 @@ atribuído a `innerHTML`.
 
 ---
 
-## 🚩 Etapa 1 — Seu próprio conjunto de dados
+## 🚩 Sprint 8 (etapa 1) — Seu próprio conjunto de dados
 
 Antes de gerar os cartões dinamicamente, é preciso ter os dados. Esta etapa monta a fonte de informação que vai alimentar a galeria nas próximas entregas.
 
