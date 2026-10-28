@@ -1,9 +1,12 @@
+import { API_TOKEN } from "./config.js";
+
 // Endereço do servidor e cabeçalhos enviados em todas as solicitações. O
-// token identifica o usuário no servidor do projeto.
+// token identifica o usuário no servidor do projeto; ele vem do config.js,
+// que fica fora do Git (modelo em config.example.js).
 export const apiConfig = {
   baseUrl: "https://around-api.pt-br.tripleten-services.com/v1",
   headers: {
-    authorization: "76e5385b-03a5-4650-987b-99f27f31e2ff",
+    authorization: API_TOKEN,
     "Content-Type": "application/json",
   },
 };

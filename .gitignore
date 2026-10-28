@@ -1,2 +1,5 @@
 .DS_Store
 node_modules
+
+# Token da API (modelo em src/utils/config.example.js)
+src/utils/config.js

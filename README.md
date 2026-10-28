@@ -68,7 +68,8 @@ vêm do servidor do projeto e são salvos nele. Recarregar a página mantém tud
   quando a rede falha — um 404 ou 500 chegaria ao `then()` como se tivesse
   dado certo.
 - Uma única instância, criada no `index.js` com o endereço do servidor e o
-  token.
+  token. O token fica em `src/utils/config.js`, fora do Git (modelo em
+  `config.example.js`).
 
 ### A ordem das coisas
 
@@ -314,6 +315,7 @@ web_project_around_pt/
 │   │   ├── index.css            ← Orquestrador de imports
 │   │   └── index.js             ← Instâncias e ouvintes
 │   ├── utils/
+│   │   ├── config.example.js    ← Modelo do config.js (o token fica fora do Git)
 │   │   └── constants.js         ← Servidor, configuração e seletores
 │   ├── vendor/
 │   │   ├── fonts/               ← Arquivos .woff2 da fonte Inter
@@ -326,6 +328,11 @@ web_project_around_pt/
 ---
 
 ## 💻 Como executar localmente
+
+Antes da primeira vez, crie o arquivo com o token da API: copie
+`src/utils/config.example.js` para `src/utils/config.js` e coloque o token
+fornecido pelo curso em `API_TOKEN`. Sem esse arquivo, os scripts não
+carregam.
 
 ```bash
 cd src
